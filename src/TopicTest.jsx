@@ -23,7 +23,7 @@ export default function TopicTest({ subject, onExit }) {
   return <section>
     <h2 tabIndex={-1} ref={heading}>{test ? `Тест по ${chosen.length} избрани теми` : 'Избери темите за теста'}</h2>
     {test ? <LessonQuiz key={test.id} lesson={test} onExit={() => setTest(null)} exitLabel="← Промени избраните теми"/> : <>
-      <button className="back lesson-back" onClick={onExit}>← Всички уроци по география</button>
+      <button className="back lesson-back" onClick={onExit}>← Всички уроци по {subject.name.toLowerCase()}</button>
       <p className="catalog-note">Избери отделни теми или всички готови теми от раздел. В теста ще има въпроси от всяка избрана тема. Темите без въпроси ще станат достъпни, когато ги подготвим.</p>
       <form onSubmit={start}>
         {[...new Set(subject.lessons.map(l => l.section))].map(section => {

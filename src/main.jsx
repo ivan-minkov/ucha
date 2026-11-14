@@ -9,7 +9,7 @@ import SummaryText from './SummaryText'
 
 function Icon({ type = 'book', ...props }) {
   return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
-    {type === 'arrow' ? <path d="M5 12h14m-6-6 6 6-6 6" /> : type === 'globe' ? <><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 6h14M5 18h14"/></> : <><path d="M12 6c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1Zm0 0v15"/></>}
+    {type === 'arrow' ? <path d="M5 12h14m-6-6 6 6-6 6" /> : type === 'globe' ? <><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 6h14M5 18h14"/></> : type === 'leaf' ? <><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></> : <><path d="M12 6c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V5c-3-1-6-1-9 1Zm0 0v15"/></>}
   </svg>
 }
 
@@ -45,7 +45,7 @@ function App() {
     if (index === 0) { setGrade(null); setSubject(null) }
     if (index === 1) setSubject(null)
   }
-  const title = topicTestOpen ? 'Тест по избрани теми' : (quizOpen && lesson ? `Тест: ${lesson.title}` : lesson?.title) ?? ['В кой клас си?', 'Какво ще учим днес?', 'География'][step]
+  const title = topicTestOpen ? 'Тест по избрани теми' : (quizOpen && lesson ? `Тест: ${lesson.title}` : lesson?.title) ?? ['В кой клас си?', 'Какво ще учим днес?', subject?.name ?? 'Уроци'][step]
   return <div className="app">
     <header className="header"><button className="brand" onClick={() => goTo(0)} aria-label="Уроци — начало"><span className="brand-icon"><Icon/></span>уроци<span className="brand-period">.</span></button><ThemePicker/></header>
     <main>
@@ -58,11 +58,11 @@ function App() {
           <h1 ref={heading} tabIndex={-1}>{title}</h1>
           <p className="intro">{topicTestOpen ? 'Провери знанията си по избраните теми.' : step === 0 ? 'Големите знания започват с малка стъпка. Избери своя клас и да започваме.' : step === 1 ? 'Избери предмет и открий най-важното от уроците на едно място.' : lesson ? `${lesson.section} · Страница ${lesson.page} в учебника` : 'Всички теми от учебника, подредени по раздели. Избери урок, за да отвориш неговото обобщение.'}</p>
           {step === 0 && <div className="choices">{grades.map(item => <button className="choice" key={item.id} onClick={() => setGrade(item)}><span className="grade-number">7<span>КЛАС</span></span><span className="choice-text"><strong>Седми клас</strong><span>Нова година, нови открития</span></span><span className="choice-arrow"><Icon type="arrow"/></span></button>)}<p className="availability">Започваме със 7. клас. Останалите предстоят.</p></div>}
-          {step === 1 && <div className="choices">{subjects.filter(item => item.gradeId === grade.id).map(item => <button className="choice" key={item.id} onClick={() => setSubject(item)}><span className="subject-icon"><Icon type="globe" width="38" height="38"/></span><span className="choice-text"><strong>{item.name}</strong><span>{item.description}</span></span><span className="choice-arrow"><Icon type="arrow"/></span></button>)}<p className="availability">Засега е наличен само предметът География.</p></div>}
-          {step === 2 && !quizOpen && !topicTestOpen && subject.textbook && <a className="textbook-link" href={`${import.meta.env.BASE_URL}${subject.textbook}${lesson ? `?lesson=${encodeURIComponent(lesson.id)}#page-${lesson.page + 2}` : ''}`}><Icon/> Отвори учебника <span aria-hidden="true">→</span></a>}
+          {step === 1 && <div className="choices">{subjects.filter(item => item.gradeId === grade.id).map(item => <button className="choice" key={item.id} onClick={() => setSubject(item)}><span className="subject-icon"><Icon type={item.icon ?? 'book'} width="38" height="38"/></span><span className="choice-text"><strong>{item.name}</strong><span>{item.description}</span></span><span className="choice-arrow"><Icon type="arrow"/></span></button>)}<p className="availability">Избери предмет от {grade.name}.</p></div>}
+          {step === 2 && !quizOpen && !topicTestOpen && subject.textbook && <a className="textbook-link" href={`${import.meta.env.BASE_URL}${subject.textbook}${lesson ? `?lesson=${encodeURIComponent(lesson.id)}#page-${lesson.page + (subject.pageOffset ?? 0)}` : ''}`}><Icon/> Отвори учебника <span aria-hidden="true">→</span></a>}
           {step === 2 && <div className="lesson-area">
             {topicTestOpen ? <TopicTest subject={subject} onExit={() => setTopicTestOpen(false)}/> : lesson ? quizOpen ? <LessonQuiz key={lesson.id} lesson={lesson} onExit={() => setQuizOpen(false)}/> : <>
-              <button className="back lesson-back" onClick={() => setLesson(null)}>← Всички уроци по география</button>
+              <button className="back lesson-back" onClick={() => setLesson(null)}>← Всички уроци по {subject.name.toLowerCase()}</button>
               {lesson.summary ? <article className="lesson-summary"><h2>Най-важното накратко</h2>{lesson.summarySections ? lesson.summarySections.map(section => <section className="summary-section" key={section.title}><h3>{section.title}</h3><p><SummaryText text={section.text} highlights={section.highlights}/></p></section>) : <p>{lesson.summary}</p>}</article> : <div className="empty-state"><span className="empty-icon"><Icon width="34" height="34"/></span><h2>Обобщението предстои</h2><p>Все още няма добавена обобщена информация за този урок.</p><span className="soon"><span className="dot"/> Очаквай скоро</span></div>}
               <div className="quiz-area quiz-invitation"><div><h2>Прочете ли урока?</h2><p>Провери какво запомни с кратък тест.</p></div><button className="quiz-primary" onClick={() => setQuizOpen(true)}>Направи тест</button></div>
             </> : <>

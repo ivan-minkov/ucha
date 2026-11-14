@@ -7214,4 +7214,9 @@ export const geographyLessons = [
     ]
   }
 ]
-export const subjects = [{ id: 'geography', gradeId: '7', name: 'География', description: 'Опознай света около теб.', textbook: 'textbooks/7/geography/index.html', lessons: geographyLessons }]
+import { biologyLessons } from './biologyLessons'
+
+export const subjects = [
+  { id: 'geography', gradeId: '7', name: 'География', description: 'Опознай света около теб.', icon: 'globe', pageOffset: 2, textbook: 'textbooks/7/geography/index.html', lessons: geographyLessons },
+  { id: 'biology', gradeId: '7', name: 'Биология', description: 'Открий тайните на живата природа.', icon: 'leaf', pageOffset: 0, textbook: 'textbooks/7/biology/index.html', lessons: biologyLessons }
+]
